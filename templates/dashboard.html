@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – TaskFlow{% endblock %}
+
+{% block content %}
+<!-- ── Analytics Summary ───────────────────────────────────────────────── -->
+<section class="analytics-section">
+    <h2 class="section-title">📊 Analytics Overview</h2>
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <span class="stat-value" id="statTotal">–</span>
+            <span class="stat-label">Total Tasks</span>
+        </div>
+        <div class="stat-card stat-completed">
+            <span class="stat-value" id="statCompleted">–</span>
+            <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-card stat-pending">
+            <span class="stat-value" id="statPending">–</span>
+            <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-card stat-progress">
+            <span class="stat-value" id="statInProgress">–</span>
+            <span class="stat-label">In Progress</span>
+        </div>
+        <div class="stat-card stat-pct">
+            <span class="stat-value" id="statPct">–</span>
+            <span class="stat-label">Completion %</span>
+        </div>
+    </div>
+    <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+</section>
+
+<!-- ── Add Task ───────────────────────────────────────────────────────── -->
+<section class="add-task-section">
+    <h2 class="section-title">➕ Add New Task</h2>
+    <div class="task-form-card">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="taskTitle">Title *</label>
+                <input type="text" id="taskTitle" placeholder="What needs to be done?" />
+            </div>
+            <div class="form-group">
+                <label for="taskPriority">Priority</label>
+                <select id="taskPriority">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="taskDesc">Description</label>
+            <textarea id="taskDesc" rows="2" placeholder="Optional details…"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="createTask()">Add Task</button>
+        <p id="taskError" class="form-error hidden"></p>
+    </div>
+</section>
+
+<!-- ── Filter bar ─────────────────────────────────────────────────────── -->
+<section class="task-list-section">
+    <div class="list-header">
+        <h2 class="section-title">📋 My Tasks</h2>
+        <div class="filters">
+            <select id="filterStatus" onchange="loadTasks()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            <select id="filterPriority" onchange="loadTasks()">
+                <option value="">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+    </div>
+    <div id="taskList" class="task-list">
+        <p class="empty-state">Loading tasks…</p>
+    </div>
+</section>
+
+<!-- ── Edit Modal ─────────────────────────────────────────────────────── -->
+<div id="editModal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-card">
+        <h3>Edit Task</h3>
+        <input type="hidden" id="editId" />
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="editTitle" />
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="editDesc" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="editPriority">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="editStatus">
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Real-time notification badge ──────────────────────────────────── -->
+<div id="toastContainer" class="toast-container"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

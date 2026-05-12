@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Register – TaskFlow{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="auth-logo">✅</span>
+            <h1>Create Account</h1>
+            <p>Start managing your tasks today</p>
+        </div>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="johndoe" required />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password <span class="hint">(min 6 chars)</span></label>
+                <input type="password" id="password" name="password" placeholder="••••••" required />
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            <ul id="formErrors" class="form-error-list hidden"></ul>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errList = document.getElementById("formErrors");
+    errList.classList.add("hidden");
+    errList.innerHTML = "";
+
+    const body = {
+        username: document.getElementById("username").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+    };
+
+    const res = await fetch("{{ url_for('auth.register') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+        window.location.href = "{{ url_for('tasks.dashboard') }}";
+    } else {
+        (data.errors || ["Registration failed."]).forEach(err => {
+            const li = document.createElement("li");
+            li.textContent = err;
+            errList.appendChild(li);
+        });
+        errList.classList.remove("hidden");
+    }
+});
+</script>
+{% endblock %}
