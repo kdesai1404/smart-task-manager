@@ -48,7 +48,7 @@ def create_app(config_class=Config):
 # ── WebSocket events ──────────────────────────────────────────────────────────
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 # Expose socketio to blueprints via app context
 app.socketio = socketio
